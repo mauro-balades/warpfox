@@ -1,0 +1,6 @@
+usage:
+  path: &path_system_usage
+    libraries: null
+    compile_flags: '-pthread'
+    link_flags: "${{ target_platform == 'darwin' ? '' : '-pthread' }}"
+  system: *path_system_usage

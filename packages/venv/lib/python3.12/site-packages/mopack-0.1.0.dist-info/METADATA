@@ -1,0 +1,101 @@
+Metadata-Version: 2.1
+Name: mopack
+Version: 0.1.0
+Summary: A multiple-origin package manager
+Home-page: https://github.com/jimporter/mopack
+Author: Jim Porter
+Author-email: itsjimporter@gmail.com
+License: BSD-3-Clause
+Keywords: package manager
+Platform: UNKNOWN
+Classifier: Development Status :: 3 - Alpha
+Classifier: Intended Audience :: Developers
+Classifier: Topic :: Software Development :: Build Tools
+Classifier: License :: OSI Approved :: BSD License
+Classifier: Programming Language :: Python :: 3
+Classifier: Programming Language :: Python :: 3.6
+Classifier: Programming Language :: Python :: 3.7
+Classifier: Programming Language :: Python :: 3.8
+Classifier: Programming Language :: Python :: 3.9
+Classifier: Programming Language :: Python :: 3.10
+Classifier: Programming Language :: Python :: 3.11
+Description-Content-Type: text/markdown
+Requires-Dist: colorama
+Requires-Dist: pyparsing (>=3.0)
+Requires-Dist: pyyaml
+Requires-Dist: setuptools
+Provides-Extra: dev
+Requires-Dist: bfg9000 ; extra == 'dev'
+Requires-Dist: conan ; extra == 'dev'
+Requires-Dist: coverage ; extra == 'dev'
+Requires-Dist: flake8-quotes ; extra == 'dev'
+Requires-Dist: flake8 (>=3.6) ; extra == 'dev'
+Requires-Dist: mike (>=0.3.1) ; extra == 'dev'
+Requires-Dist: mkdocs-bootswatch-classic ; extra == 'dev'
+Requires-Dist: shtab ; extra == 'dev'
+Requires-Dist: verspec ; extra == 'dev'
+Provides-Extra: test
+Requires-Dist: bfg9000 ; extra == 'test'
+Requires-Dist: conan ; extra == 'test'
+Requires-Dist: coverage ; extra == 'test'
+Requires-Dist: flake8-quotes ; extra == 'test'
+Requires-Dist: flake8 (>=3.6) ; extra == 'test'
+Requires-Dist: shtab ; extra == 'test'
+
+# mopack
+**mopack** (pronounced "ammopack") is a *multiple origin* package manager, with
+an emphasis on C/C++ packages. It's designed to allow users to resolve package
+dependencies from multiple package managers ("origins").
+
+## Why mopack?
+
+### Separate abstract and concrete dependencies
+
+Generally speaking, developers of a project are more concerned about
+dependencies in the abstract: if your project requires Boost v1.50+, that's all
+that really matters. However, when building a project, you work with concrete
+dependencies: you naturally have to download a particular version of Boost and
+build/install it in a particular way. mopack supports this by letting a
+project's build system asking how to use (link to) an abstract dependency, which
+mopack will resolve via a particular concrete dependency.
+
+### No configuration necessary
+
+If you've already downloaded and installed a project's dependencies, you usually
+don't need to do anything else. mopack can find dependencies using common
+methods for the relevant platform (e.g. pkg-config, searching system paths).
+
+### Easy overrides
+
+To simplify building their project, developers can provide a default mopack
+configuration so that a standard build just works without any extra effort.
+However, people who *build* the project may prefer to resolve packages from
+somewhere else. mopack makes this easy: simply pass in an extra mopack file with
+new definitions for any dependency, and mopack will use those instead.
+
+## Installation
+
+mopack uses [setuptools][setuptools], so installation is much the same as any
+other Python package:
+
+```sh
+$ pip install mopack
+```
+
+From there, you can start using mopack to build your software!
+
+## License
+
+This project is licensed under the [BSD 3-clause license](LICENSE).
+
+[pypi-image]: https://img.shields.io/pypi/v/mopack.svg
+[pypi-link]: https://pypi.python.org/pypi/mopack
+[documentation-image]: https://img.shields.io/badge/docs-mopack-blue.svg
+[documentation-link]: https://jimporter.github.io/mopack/
+[ci-image]: https://github.com/jimporter/mopack/workflows/build/badge.svg
+[ci-link]: https://github.com/jimporter/mopack/actions?query=branch%3Amaster+workflow%3Abuild
+[codecov-image]: https://codecov.io/gh/jimporter/mopack/branch/master/graph/badge.svg
+[codecov-link]: https://codecov.io/gh/jimporter/mopack
+[setuptools]: https://pythonhosted.org/setuptools/
+
+

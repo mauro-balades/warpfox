@@ -1,0 +1,6 @@
+usage:
+  path: &path_system_usage
+    - if: target_platform == 'windows' || target_platform == 'darwin'
+      libraries: [zlib]
+    - libraries: [z]
+  system: *path_system_usage

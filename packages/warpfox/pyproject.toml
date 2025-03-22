@@ -1,0 +1,33 @@
+
+[project]
+name = "warpfox"
+version = "2020.0.0"
+dependencies = [
+  "mopack",
+  "loguru"
+]
+requires-python = ">=3.8"
+authors = [
+]
+description = "Build cross platform, secure, and reliable software."
+readme = "README.md"
+license = "MIT"  # or license = {file = "LICENSE.txt"} for legacy declaration
+license-files = ["LICEN[CS]E.*"]
+keywords = ["firefox", "warpfox", "web", "browser", "automation"]
+classifiers = [
+  "Development Status :: 4 - Beta",
+  "Programming Language :: Python"
+]
+
+[project.optional-dependencies]
+cli = [
+  "mypy",
+]
+
+[project.urls]
+Homepage = "https://github.com/mauro-balades/warpfox"
+Repository = "https://github.com/mauro-balades/warpfox.git"
+"Bug Tracker" = "https://github.com/mauro-balades/warpfox/issues"
+
+[project.scripts]
+warpfox = "warpfox:main"

@@ -1,0 +1,30 @@
+origin:
+  '*':
+    submodules: '*'
+usage:
+  system:
+    submodule_map:
+      '*':
+        &submodule_map
+        dependencies: ['Qt5[Core]']
+        pcname: Qt5$submodule
+        include_path: >-
+          ${{ env['QT_INCLUDEDIR'] ?
+                [ env['QT_INCLUDEDIR'],
+                  env['QT_INCLUDEDIR'] + '/Qt' + submodule ] :
+                env['QT_ROOT'] ?
+                  [ env['QT_ROOT'] + '/include',
+                    env['QT_ROOT'] + '/include/Qt' + submodule ] :
+                  null }}
+        library_path: >-
+          ${{ env['QT_LIBRARYDIR'] || (
+            env['QT_ROOT'] ? env['QT_ROOT'] + '/lib' : null
+          ) }}
+        headers: [Qt$submodule]
+        libraries: [Qt5$submodule]
+      Core:
+        <<: *submodule_map
+        dependencies: null
+        headers: [QtCore, QtCore/QtCore]
+      # XXX: Other Qt submodules probably need additional dependencies, but
+      # the above should be sufficient for basic cases.
