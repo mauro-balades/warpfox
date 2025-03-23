@@ -5,12 +5,13 @@ use std::io::Write;
 use std::cmp::min;
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
-use anyhow::{Context, Result};
+use anyhow::Context;  
 use std::path::PathBuf;
 use std::time::Duration;
 use tokio::time::timeout;
 
 type Result<T> = std::result::Result<T, anyhow::Error>;
+
 
 async fn download_firefox_source(version: &str) -> Result<PathBuf> {
     log::debug!("Downloading firefox source code for version {}", version);
