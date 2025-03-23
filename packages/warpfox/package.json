@@ -15,6 +15,9 @@
   },
   "type": "module",
   "dependencies": {
+    "axios": "^1.8.4",
+    "cli-progress": "^3.12.0",
+    "cross-spawn": "^7.0.6",
     "cute-logger": "^8.0.5"
   }
 }
