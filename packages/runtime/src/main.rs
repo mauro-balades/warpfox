@@ -7,6 +7,8 @@ use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
 use anyhow::{Context, Result};
 use std::path::PathBuf;
+use std::time::Duration;
+use tokio::time::timeout;
 
 type Result<T> = std::result::Result<T, anyhow::Error>;
 
@@ -23,9 +25,14 @@ async fn download_firefox_source(version: &str) -> Result<PathBuf> {
         .tempdir()
         .context("Failed to create temporary directory")?;
 
-    let response = reqwest::get(&url)
-        .await
-        .context(format!("Failed to GET from '{}'", &url))?;
+    // Add timeout for network operations
+    let response = timeout(
+        Duration::from_secs(60),
+        reqwest::get(&url)
+    ).await
+    .context("Request timed out")??
+    .error_for_status()
+    .context(format!("Failed to GET from '{}'", &url))?;
 
     let total_size = response
         .content_length()
@@ -35,7 +42,7 @@ async fn download_firefox_source(version: &str) -> Result<PathBuf> {
     pb.set_style(
         ProgressStyle::default_bar()
             .template("{msg}\n{spinner:.green} [{elapsed_precise}] [{wide_bar:.cyan/blue}] {bytes}/{total_bytes} ({bytes_per_sec}, {eta})")
-            .unwrap()
+            .context("Failed to create progress bar style")?
             .progress_chars("#>-")
     );
     pb.set_message(format!("Downloading {}", url));
@@ -83,12 +90,23 @@ fn unpack_firefox_source(source_tar: PathBuf) -> Result<PathBuf> {
 
 fn cleanup(source_tar_dir: &PathBuf) -> Result<()> {
     log::info!("Cleaning up");
-    std::fs::remove_dir_all(source_tar_dir).context("Failed to remove temporary directory")?;
+    if source_tar_dir.exists() {
+        std::fs::remove_dir_all(source_tar_dir).context("Failed to remove temporary directory")?;
+    }
     Ok(())
 }
 
 #[tokio::main]
 async fn main() -> Result<()> {
+    // Set up signal handling for graceful shutdown
+    let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
+    
+    tokio::spawn(async move {
+        if let Ok(_) = tokio::signal::ctrl_c().await {
+            let _ = shutdown_tx.send(());
+        }
+    });
+
     SimpleLogger::new()
         .with_colors(true)
         .without_timestamps()
@@ -102,12 +120,24 @@ async fn main() -> Result<()> {
         .context("Missing 'version' in firefox.json")?;
 
     log::info!("Starting runtime for firefox v{}", version);
+    
     let source_tar_dir = download_firefox_source(version).await?;
     let source_tar = source_tar_dir.join(format!("firefox-{}.source.tar.xz", version));
     log::info!("Downloaded source code to {:?}", source_tar);
+    
     let source_dir = unpack_firefox_source(source_tar)?;
     log::info!("Unpacked source code to {:?}", source_dir);
 
     cleanup(&source_tar_dir)?;
+
+    // Handle shutdown signal
+    tokio::select! {
+        _ = shutdown_rx => {
+            log::info!("Received shutdown signal, cleaning up...");
+            cleanup(&source_tar_dir)?;
+        }
+        _ = async {} => {}
+    }
+
     Ok(())
 }
