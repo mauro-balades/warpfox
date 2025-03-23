@@ -7,6 +7,8 @@ ac_add_options --enable-artifact-builds
 
 
 def get_mozconfig_contents():
-    return [
-        BASIC_BUILD_CONFIG,
-    ].join("\n")
+    return "\n".join(
+        [
+            BASIC_BUILD_CONFIG,
+        ]
+    )

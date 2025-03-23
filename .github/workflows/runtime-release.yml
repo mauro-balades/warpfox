@@ -47,7 +47,8 @@ jobs:
 
       - name: Move engine directory and create tarball
         run: |
-          tar -czf firefox-source.tar.gz packages/runtime/engine/
+          mv packages/runtime/engine/ ./firefox
+          tar -czf firefox-source.tar.gz ./firefox
 
       - name: Release
         uses: softprops/action-gh-release@v2
