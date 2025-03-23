@@ -32,7 +32,6 @@ class Manifest:
         self.data = data
         self.name = data.get("name")
         self.brands = data.get("brands", [])
-        self.description = data.get("description", "")
 
     def __str__(self) -> str:
-        return f"{self.name} ({self.description})"
+        return f"{self.name}"

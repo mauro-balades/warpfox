@@ -1,17 +1,16 @@
-use simple_logger::SimpleLogger;
-use tempfile::Builder;
-use std::fs::File;
-use std::io::Write;
-use std::cmp::min;
+use anyhow::Context;
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
-use anyhow::Context;  
+use simple_logger::SimpleLogger;
+use std::cmp::min;
+use std::fs::File;
+use std::io::Write;
 use std::path::PathBuf;
 use std::time::Duration;
+use tempfile::Builder;
 use tokio::time::timeout;
 
 type Result<T> = std::result::Result<T, anyhow::Error>;
-
 
 async fn download_firefox_source(version: &str) -> Result<PathBuf> {
     log::debug!("Downloading firefox source code for version {}", version);
@@ -27,13 +26,11 @@ async fn download_firefox_source(version: &str) -> Result<PathBuf> {
         .context("Failed to create temporary directory")?;
 
     // Add timeout for network operations
-    let response = timeout(
-        Duration::from_secs(60),
-        reqwest::get(&url)
-    ).await
-    .context("Request timed out")??
-    .error_for_status()
-    .context(format!("Failed to GET from '{}'", &url))?;
+    let response = timeout(Duration::from_secs(60), reqwest::get(&url))
+        .await
+        .context("Request timed out")??
+        .error_for_status()
+        .context(format!("Failed to GET from '{}'", &url))?;
 
     let total_size = response
         .content_length()
@@ -51,13 +48,17 @@ async fn download_firefox_source(version: &str) -> Result<PathBuf> {
     let mut downloaded: u64 = 0;
     let mut stream = response.bytes_stream();
 
-    let fname = url.rsplit('/').next().context(format!("Failed to get filename from '{}'", &url))?;
+    let fname = url
+        .rsplit('/')
+        .next()
+        .context(format!("Failed to get filename from '{}'", &url))?;
     let fname = tmp_dir.path().join(fname);
     let mut dest = File::create(&fname).context("Failed to create file")?;
 
     while let Some(item) = stream.next().await {
         let chunk = item.context("Error while downloading file")?;
-        dest.write_all(&chunk).context("Error while writing to file")?;
+        dest.write_all(&chunk)
+            .context("Error while writing to file")?;
         let new = min(downloaded + (chunk.len() as u64), total_size);
         downloaded = new;
         pb.set_position(new);
@@ -83,7 +84,10 @@ fn unpack_firefox_source(source_tar: PathBuf) -> Result<PathBuf> {
         .context("Failed to execute tar command")?;
 
     if !status.success() {
-        return Err(anyhow::anyhow!("tar command failed with status: {}", status));
+        return Err(anyhow::anyhow!(
+            "tar command failed with status: {}",
+            status
+        ));
     }
 
     Ok(output)
@@ -101,7 +105,7 @@ fn cleanup(source_tar_dir: &PathBuf) -> Result<()> {
 async fn main() -> Result<()> {
     // Set up signal handling for graceful shutdown
     let (shutdown_tx, shutdown_rx) = tokio::sync::oneshot::channel();
-    
+
     tokio::spawn(async move {
         if let Ok(_) = tokio::signal::ctrl_c().await {
             let _ = shutdown_tx.send(());
@@ -114,18 +118,19 @@ async fn main() -> Result<()> {
         .init()
         .context("Failed to initialize logger")?;
 
-    let manifest: serde_json::Value = serde_json::from_str(include_str!("../../../firefox.json"))
-        .context("Failed to parse firefox.json")?;
+    let manifest: serde_json::Value =
+        serde_json::from_str(include_str!("../../warpfox/firefox.json"))
+            .context("Failed to parse firefox.json")?;
     let version = manifest["version"]
         .as_str()
         .context("Missing 'version' in firefox.json")?;
 
     log::info!("Starting runtime for firefox v{}", version);
-    
+
     let source_tar_dir = download_firefox_source(version).await?;
     let source_tar = source_tar_dir.join(format!("firefox-{}.source.tar.xz", version));
     log::info!("Downloaded source code to {:?}", source_tar);
-    
+
     let source_dir = unpack_firefox_source(source_tar)?;
     log::info!("Unpacked source code to {:?}", source_dir);
 

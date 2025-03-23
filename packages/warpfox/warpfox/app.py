@@ -1,7 +1,9 @@
-from .manifest import Manifest
+from ..manifest import Manifest
 
 import sys
 import time
+import os
+
 from loguru import logger
 
 
@@ -18,12 +20,11 @@ class App:
         self.command = command
         self.manifest_path = manifest_path
 
-    def run(self) -> int:
-        """Runs the application.
+        self.init_logger()
+        self.init_dirs()
 
-        Returns:
-            int: The exit code.
-        """
+    def init_logger(self) -> None:
+        """Initializes the logger."""
         logger.remove()
         logger.add(
             sys.stdout,
@@ -31,8 +32,17 @@ class App:
             format="<level>{level.name: <7}</level>: {message}",
         )
 
-        start_time = time.time()
+    def init_dirs(self) -> None:
+        """Initializes the directories."""
+        os.makedirs(".warpfox", exist_ok=True)
 
+    def run(self) -> int:
+        """Runs the application.
+
+        Returns:
+            int: The exit code.
+        """
+        start_time = time.time()
         try:
             manifest = Manifest(self.manifest_path)
             logger.info(f"Running command '{self.command}' for package: {manifest}")
