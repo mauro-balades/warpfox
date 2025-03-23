@@ -12,7 +12,7 @@ authors = [
 ]
 description = "Build cross platform, secure, and reliable software."
 readme = "README.md"
-license = "MIT"  # or license = {file = "LICENSE.txt"} for legacy declaration
+license = "MIT"
 license-files = ["LICEN[CS]E.*"]
 keywords = ["firefox", "warpfox", "web", "browser", "automation"]
 classifiers = [

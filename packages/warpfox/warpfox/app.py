@@ -76,7 +76,6 @@ class App:
                 f"Running command '{self.command}' for package: {self.manifest}"
             )
             self.init_firefox()
-            self.bootstrap_firefox()
             self.build_firefox()
         except Exception as e:
             logger.error(f"Failed to run command '{self.command}': {e}")
@@ -107,6 +106,7 @@ class App:
             with tarfile.open(".warpfox/firefox-source.tar.gz") as tar:
                 logger.info("Extracting Firefox source code")
                 tar.extractall(".warpfox/")
+        self.initialize_firefox_git()
         self.config["intialized"] = True
 
     def download_progress(
@@ -124,13 +124,16 @@ class App:
             end="\r",
         )
 
-    def bootstrap_firefox(self) -> None:
-        """Bootstrap Firefox"""
-        if "bootstrapped" in self.config and self.config["bootstrapped"]:
+    def initialize_firefox_git(self) -> None:
+        """Initialize the Firefox git repository."""
+        if os.path.exists(".warpfox/firefox/.git"):
             return
-        logger.info("Bootstrapping Firefox")
-        os.system("cd .warpfox/firefox && ./mach bootstrap")
-        self.config["bootstrapped"] = True
+        version = self.config["firefox-version"]
+        logger.debug("Initializing Firefox git repository (note: this may take a while)")
+        os.system("cd .warpfox/firefox && git init")
+        os.system(f"cd .warpfox/firefox && git checkout --orphan {version}")
+        os.system(f'cd .warpfox/firefox && git add -f . && git commit -aqm "Firefox {version}"')
+        os.system(f"cd .warpfox/firefox && git checkout -b warpfox_{version.lower().replace('.', '_')}")
 
     def build_firefox(self) -> None:
         """Build Firefox"""

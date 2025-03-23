@@ -1,8 +1,12 @@
 BASIC_BUILD_CONFIG = """
-ac_add_options --enable-application=browser_artifact_mode
+ac_add_options --enable-application=browser
+ac_add_options --enable-bootstrap
 
-# For faster builds
-ac_add_options --enable-artifact-builds
+# ccache
+ac_add_options --with-ccache
+ac_add_options --with-branding=browser/branding/unofficial
+
+MOZ_APP_NAME=test
 """
 
 
