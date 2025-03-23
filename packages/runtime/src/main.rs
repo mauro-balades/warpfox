@@ -86,9 +86,11 @@ fn unpack_firefox_source(
     Ok(output)
 }
 
-fn cleanup(source_tar: &std::path::PathBuf) -> Result<(), std::io::Error> {
-    log::debug!("Cleaning up");
-    std::fs::remove_file(source_tar)
+fn cleanup(source_tar_dir: &std::path::PathBuf) -> Result<(), std::io::Error> {
+    log::info!("Cleaning up");
+    // Remove directory
+    std::fs::remove_dir_all(source_tar_dir).unwrap();
+    Ok(())
 }
 
 #[tokio::main]
@@ -104,11 +106,12 @@ async fn main() -> Result<(), Error> {
     let version = manifest["version"].as_str().unwrap();
 
     log::info!("Starting runtime for firefox v{}", version);
-    let source_tar = download_firefox_source(version).await.unwrap();
+    let source_tar_dir = download_firefox_source(version).await.unwrap();
+    let source_tar = source_tar_dir.join("firefox-".to_string() + version + ".source.tar.xz");
     log::info!("Downloaded source code to {:?}", source_tar);
     let source_dir = unpack_firefox_source(source_tar.clone()).unwrap();
     log::info!("Unpacked source code to {:?}", source_dir);
 
-    cleanup(&source_tar).unwrap();
+    cleanup(&source_tar_dir).unwrap();
     Ok(())
 }
