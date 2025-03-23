@@ -31,7 +31,8 @@ jobs:
         id: get-firefox-version
         run: |
           echo "Getting Firefox version"
-          FIREFOX_VERSION=$(curl -s https://product-details.mozilla.org/1.0/firefox_versions.json | jq -r '.FIREFOX_NIGHTLY')
+          echo "Fetching data from packages/warpfox/firefox.json"
+          FIREFOX_VERSION=$(jq -r '.version' packages/warpfox/firefox.json)
           echo "FIREFOX_VERSION=$FIREFOX_VERSION" >> $GITHUB_ENV
           echo "FIREFOX_VERSION=$FIREFOX_VERSION"
 
