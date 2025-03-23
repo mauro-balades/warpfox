@@ -101,14 +101,12 @@ class App:
                 ".warpfox/firefox-source.tar.gz",
                 reporthook=self.download_progress,
             )
-            print()
             self.progress_bar = None
-        if not os.path.exists(".warpfox/firefox-source"):
-            logger.info("Extracting Firefox source code")
-            os.mkdir(".warpfox/firefox-source")
+        if not os.path.exists(".warpfox/firefox"):
+            os.mkdir(".warpfox/firefox")
             with tarfile.open(".warpfox/firefox-source.tar.gz") as tar:
                 logger.info("Extracting Firefox source code")
-                tar.extractall(".warpfox/firefox-source")
+                tar.extractall(".warpfox/")
         self.config["intialized"] = True
 
     def download_progress(
@@ -131,13 +129,13 @@ class App:
         if "bootstrapped" in self.config and self.config["bootstrapped"]:
             return
         logger.info("Bootstrapping Firefox")
-        os.system("cd .warpfox/firefox-source && ./mach bootstrap")
+        os.system("cd .warpfox/firefox && ./mach bootstrap")
         self.config["bootstrapped"] = True
 
     def build_firefox(self) -> None:
         """Build Firefox"""
         logger.info("Populating mozconfig")
-        with open(".warpfox/firefox-source/mozconfig", "w") as f:
+        with open(".warpfox/firefox/mozconfig", "w") as f:
             f.write(mozconfig.get_mozconfig_contents())
         logger.info("Building Firefox")
-        os.system("cd .warpfox/firefox-source && ./mach build")
+        os.system("cd .warpfox/firefox && ./mach build")
