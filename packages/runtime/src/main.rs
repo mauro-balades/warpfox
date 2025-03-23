@@ -78,6 +78,7 @@ fn unpack_firefox_source(
     let mut cmd = std::process::Command::new("tar");
     cmd.arg("-xf")
         .arg(source_tar)
+        .arg("--strip-components=1")
         .arg("-C")
         .arg(&output)
         .output()
