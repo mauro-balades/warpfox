@@ -1,0 +1,22 @@
+{
+  "name": "warpfox",
+  "module": "src/index.ts",
+  "devDependencies": {
+    "@types/bun": "latest",
+    "node-ts": "^8.0.2"
+  },
+  "peerDependencies": {
+    "typescript": "^5"
+  },
+  "scripts": {
+    "build": "bun build --entry src/index.ts --output dist",
+    "dev": "bun run --entry src/index.ts",
+    "self": "cd tests && bun run --entry ../src/index.ts"
+  },
+  "type": "module",
+  "dependencies": {
+    "cute-logger": "^8.0.5",
+    "nodejs-file-downloader": "^4.13.0",
+    "progress": "^2.0.3"
+  }
+}

@@ -2,3 +2,5 @@ venv/
 target/
 engine/
 .warpfox/
+
+node_modules/
