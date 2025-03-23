@@ -13,7 +13,6 @@ jobs:
         run: |
           echo "GITHUB_REPOSITORY: ${{ github.repository }}"
           echo "GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}"
-          echo "GITHUB_REPOSITORY_OWNER: ${{ github.repository_owner }}"
           echo "GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}"
 
   build-source:
@@ -45,18 +44,18 @@ jobs:
           cd packages/runtime
           cargo run
 
-      - name: Move engine directory
+      - name: Move engine directory and create tarball
         run: |
-          mv packages/runtime/engine/ ./firefox-source
+          tar -czf firefox-source.tar.gz packages/runtime/engine/
 
       - name: Release
         uses: softprops/action-gh-release@v2
         with:
           token: ${{ secrets.GITHUB_TOKEN }}
-          tag_name: firefox-v${{ needs.get-firefox-version.outputs.FIREFOX_VERSION }}
+          tag_name: firefox-v${{ env.FIREFOX_VERSION }}
           prerelease: false
-          fail_on_unmatched_files: false
-          generate_release_notes: false
-          name: "Release build - firefox v${{ needs.get-firefox-version.outputs.FIREFOX_VERSION }}"
+          fail_on_unmatched_files: true
+          generate_release_notes: true
+          name: "Release build - firefox v${{ env.FIREFOX_VERSION }}"
           files: |
-            firefox-source
+            firefox-source.tar.gz
