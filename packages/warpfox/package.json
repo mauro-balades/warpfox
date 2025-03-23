@@ -15,8 +15,6 @@
   },
   "type": "module",
   "dependencies": {
-    "cute-logger": "^8.0.5",
-    "nodejs-file-downloader": "^4.13.0",
-    "progress": "^2.0.3"
+    "cute-logger": "^8.0.5"
   }
 }
