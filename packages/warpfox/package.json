@@ -8,6 +8,10 @@
   "peerDependencies": {
     "typescript": "^5"
   },
+  "postinstall": {
+    "bun": "bun run --entry src/postinstall.ts",
+    "node": "node --loader ts-node/esm --no-warnings --experimental-specifier-resolution=node src/postinstall.ts"
+  },
   "scripts": {
     "build": "bun build --entry src/index.ts --output dist",
     "dev": "bun run --entry src/index.ts",
@@ -18,6 +22,7 @@
     "axios": "^1.8.4",
     "cli-progress": "^3.12.0",
     "cross-spawn": "^7.0.6",
-    "cute-logger": "^8.0.5"
+    "cute-logger": "^8.0.5",
+    "postinstall": "^0.11.1"
   }
 }

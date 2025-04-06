@@ -1,3 +1,6 @@
+mod build_firefox;
+mod bootstrap_firefox;
+
 use anyhow::Context;
 use futures_util::StreamExt;
 use indicatif::{ProgressBar, ProgressStyle};
@@ -133,6 +136,14 @@ async fn main() -> Result<()> {
 
     let source_dir = unpack_firefox_source(source_tar)?;
     log::info!("Unpacked source code to {:?}", source_dir);
+
+    crate::bootstrap_firefox::bootstrap_firefox(&source_dir)
+        .await
+        .context("Failed to bootstrap Firefox")?;
+
+    crate::build_firefox::build_firefox(&source_dir)
+        .await
+        .context("Failed to build Firefox")?;
 
     cleanup(&source_tar_dir)?;
 

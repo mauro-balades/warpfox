@@ -1,8 +1,9 @@
-import buildCommand from "./build";
+
 import logger from "./logger";
 import { parseArgs } from "util";
 import getManifestContent from "./manifest";
 import { getSavedCache, saveCache } from "./cache";
+import { runApp } from "./run";
 
 async function main(): Promise<number> {
   const args = parseArgs({
@@ -21,8 +22,8 @@ async function main(): Promise<number> {
   const startTime = Date.now();
   let exitCode = 0;
   switch (command) {
-    case "build":
-      await buildCommand({ manifest, cache });
+    case "run":
+      await runApp({ manifest, cache });
       break;
     default:
       logger.error(`Unknown command: ${command}`);
